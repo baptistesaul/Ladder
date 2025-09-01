@@ -17,9 +17,5 @@ subprojects {
                 password = findProperty("NEXUS_PASSWORD") as String?
             }
         }
-        maven {
-            name = "lunarclient"
-            url = uri("https://repo.lunarclient.dev")
-        }
     }
 }

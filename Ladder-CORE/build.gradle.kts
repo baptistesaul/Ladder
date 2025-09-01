@@ -15,8 +15,6 @@ dependencies {
     implementation(project(":Ladder-API"))
 
     compileOnly("fr.snowtyy", "papermc", "1.8.8")
-    compileOnly("com.lunarclient:apollo-api:1.1.6")
-    compileOnly("com.lunarclient:apollo-extra-adventure4:1.1.6")
 }
 
 tasks.shadowJar {

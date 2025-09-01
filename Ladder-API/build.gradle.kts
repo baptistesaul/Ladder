@@ -15,6 +15,4 @@ dependencies {
     implementation("org.slf4j", "slf4j-simple", "1.6.1")
 
     compileOnly("fr.snowtyy", "papermc", "1.8.8")
-    compileOnly("com.lunarclient:apollo-api:1.1.6")
-    compileOnly("com.lunarclient:apollo-extra-adventure4:1.1.6")
 }
