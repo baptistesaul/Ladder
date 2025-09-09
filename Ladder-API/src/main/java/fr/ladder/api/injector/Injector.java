@@ -1,0 +1,38 @@
+package fr.ladder.api.injector;
+
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.function.Consumer;
+
+/**
+ * @author Snowtyy
+ */
+public class Injector {
+
+    private static Implementation impl;
+
+    private Injector() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    public static void setupInjection(JavaPlugin plugin, Consumer<ScopedServiceCollection> consumer) {
+        impl.setupInjection(plugin, consumer);
+    }
+
+    public static void setupInjection(JavaPlugin plugin) {
+        impl.setupInjection(plugin, services -> {});
+    }
+
+    public static void runInjection() {
+        impl.runInjection();
+    }
+
+    public interface Implementation {
+
+        void setupInjection(JavaPlugin plugin, Consumer<ScopedServiceCollection> consumer);
+
+        void runInjection();
+
+    }
+
+}

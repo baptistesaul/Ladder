@@ -1,0 +1,5 @@
+name: Sample
+main: fr.sample.SamplePlugin
+version: @version@
+depend:
+  - Ladder-CORE

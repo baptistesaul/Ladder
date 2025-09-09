@@ -1,6 +1,6 @@
 package fr.ladder.core.tool;
 
-import fr.ladder.api.LadderAPI;
+import fr.ladder.api.injector.annotation.Inject;
 import fr.ladder.api.tool.Task;
 import fr.ladder.api.tool.scheduler.AsyncRunnable;
 import fr.ladder.core.LadderEngine;
@@ -16,14 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class LadderTask implements Task.Implementation {
 
-    private final LadderEngine engine;
+    @Inject
+    private static LadderEngine _engine;
 
-    private final LadderExecutor executor;
-
-    private LadderTask() {
-        this.engine = LadderAPI.get(LadderEngine.class);
-        this.executor = LadderAPI.get(LadderExecutor.class);
-    }
+    @Inject
+    private static LadderExecutor _executor;
     
     private final AtomicInteger lastId = new AtomicInteger(0);
     
@@ -31,22 +28,22 @@ public class LadderTask implements Task.Implementation {
     
     @Override
     public void run(Runnable runnable) {
-        Bukkit.getScheduler().runTask(this.engine, runnable);
+        Bukkit.getScheduler().runTask(_engine, runnable);
     }
     
     @Override
     public void runAsync(Runnable runnable) {
-        executor.schedule(runnable, 5, TimeUnit.MILLISECONDS);
+        _executor.schedule(runnable, 5, TimeUnit.MILLISECONDS);
     }
     
     @Override
     public synchronized int run(Runnable runnable, long tick) {
-        return Bukkit.getScheduler().runTaskLater(this.engine, runnable, tick).getTaskId();
+        return Bukkit.getScheduler().runTaskLater(_engine, runnable, tick).getTaskId();
     }
     
     @Override
     public synchronized int runAsync(Runnable runnable, long tick) {
-        ScheduledFuture<?> future = this.executor.schedule(runnable, tick * 50, TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = _executor.schedule(runnable, tick * 50, TimeUnit.MILLISECONDS);
         int taskId = lastId.decrementAndGet();
         this.asyncTaskMap.put(taskId, future);
         
@@ -55,7 +52,7 @@ public class LadderTask implements Task.Implementation {
     
     @Override
     public synchronized void runAsync(AsyncRunnable runnable, long delay, long period) {
-        ScheduledFuture<?> future = this.executor.scheduleAtFixedRate(runnable,
+        ScheduledFuture<?> future = _executor.scheduleAtFixedRate(runnable,
                 delay * 50,
                 period * 50,
                 TimeUnit.MILLISECONDS
