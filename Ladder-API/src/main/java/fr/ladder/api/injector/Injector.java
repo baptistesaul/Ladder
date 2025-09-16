@@ -15,6 +15,10 @@ public class Injector {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
+    public static void implement(Class<?> clazz, Object instance) {
+        impl.implement(clazz, instance);
+    }
+
     public static void setupInjection(JavaPlugin plugin, Consumer<ScopedServiceCollection> consumer) {
         impl.setupInjection(plugin, consumer);
     }
@@ -23,15 +27,11 @@ public class Injector {
         impl.setupInjection(plugin, services -> {});
     }
 
-    public static void runInjection() {
-        impl.runInjection();
-    }
-
     public interface Implementation {
 
         void setupInjection(JavaPlugin plugin, Consumer<ScopedServiceCollection> consumer);
 
-        void runInjection();
+        void implement(Class<?> clazz, Object instance);
 
     }
 

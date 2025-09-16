@@ -15,9 +15,9 @@ public interface ScopedServiceCollection {
 
  <I, Impl extends I> void addScoped(Class<I> classInterface, Impl implementation);
 
- <Impl> void addScoped(JavaPlugin plugin, Class<Impl> classImplementation);
+ <Impl> void addScoped(Class<Impl> classImplementation);
 
- <Impl> void addScoped(JavaPlugin plugin, Impl implementation);
+ <Impl> void addScoped(Impl implementation);
 
  <I, Impl extends I> void addTransient(Class<I> classInterface, Class<Impl> classImplementation);
 

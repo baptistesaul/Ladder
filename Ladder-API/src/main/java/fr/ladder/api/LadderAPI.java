@@ -10,7 +10,6 @@ public abstract class LadderAPI {
 
     public interface Implementation {
 
-        void implement(Class<?> clazz, Object instance);
 
     }
 }

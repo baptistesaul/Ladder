@@ -1,5 +1,5 @@
 name: Ladder-CORE
 version: @version@
 main: fr.ladder.core.LadderEngine
-author:
+authors:
   - Snowtyy

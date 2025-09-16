@@ -1,6 +1,7 @@
 package fr.ladder.core;
 
 import fr.ladder.api.LadderAPI;
+import fr.ladder.api.injector.ScopedServiceCollection;
 import fr.ladder.api.plugin.LadderPlugin;
 import fr.ladder.api.util.ReflectionUtils;
 import fr.ladder.api.util.WorldUtils;
@@ -10,57 +11,33 @@ import fr.ladder.core.util.LadderReflectionUtils;
 import fr.ladder.core.util.LadderWorldUtils;
 import org.github.paperspigot.PaperSpigotConfig;
 
-import java.lang.reflect.Field;
-import java.util.logging.Logger;
-
 public class LadderEngine extends LadderPlugin implements LadderAPI.Implementation {
 
-    public LadderEngine() {
-        this.implement(LadderAPI.class, this);
-        this.implement(Injector.class, new LadderInjector());
-        // implement utils
-        this.implement(ReflectionUtils.class, new LadderReflectionUtils());
-        this.implement(WorldUtils.class, new LadderWorldUtils());
-        Injector.setupInjection(this, services -> {
+    private final LadderExecutor _executor;
 
-        });
+    private final LadderInjector _injector;
+
+    public LadderEngine() {
+        _executor = new LadderExecutor();
+        // ============ SETUP INJECTOR ============
+        _injector = new LadderInjector(this);
+        _injector.implement(Injector.class, _injector);
+        // ============ SETUP UTILS ===============
+        _injector.implement(ReflectionUtils.class, new LadderReflectionUtils());
+        _injector.implement(WorldUtils.class, new LadderWorldUtils());
+        // ============ SETUP INJECTION ===========
+        Injector.setupInjection(this, this::injectAll);
+    }
+
+    private void injectAll(ScopedServiceCollection services) {
+        services.addScoped(_executor);
     }
 
     @Override
     public void onLoad() {
-        Injector.runInjection();
+        _injector.runInjection();
         super.onLoad();
         PaperSpigotConfig.strengthEffectModifier = 0.0;
         PaperSpigotConfig.weaknessEffectModifier = 0.0;
-    }
-
-    @Override
-    public void onEnable() {
-        final Logger logger = this.getLogger();
-        logger.info("==================[ enabling: " + this.getDescription().getName() + " ]==================");
-    }
-
-    @Override
-    public void implement(Class<?> clazz, Object instance) {
-        Field[] fields = clazz.getDeclaredFields();
-        for(Field field : fields) {
-            if(field.getType().isAssignableFrom(instance.getClass())) {
-                try {
-                    field.setAccessible(true);
-                    field.set(null, instance);
-                } catch (IllegalAccessException e) {
-                    this.catchException("An error occurred on implement: " + clazz.getSimpleName(), e);
-                }
-            }
-        }
-    }
-
-    public void catchException(String errorMessage, Exception e) {
-        this.getLogger().severe(errorMessage);
-        Throwable cause = e;
-        while(cause != null) {
-            this.getLogger().severe("- " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
-            cause = cause.getCause();
-        }
     }
 }

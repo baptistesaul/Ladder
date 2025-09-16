@@ -109,7 +109,6 @@ public class LadderServiceCollection implements ServiceCollection {
         _classLoaderMap.putIfAbsent(classLoader, new HashMap<>());
 
         try(IGraph graph = ReflectionUtils.getGraph(plugin)) {
-
             graph.getFieldWithAnnotation(Inject.class)
                     .filter(f -> Modifier.isPrivate(f.getModifiers()) && Modifier.isStatic(f.getModifiers()))
                     .forEach(field -> {

@@ -24,4 +24,13 @@ public abstract class LadderPlugin extends JavaPlugin {
     public void onDisable() {
 
     }
+
+    public void catchException(String errorMessage, Exception e) {
+        this.getLogger().severe(errorMessage);
+        Throwable cause = e;
+        while(cause != null) {
+            this.getLogger().severe("- " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
+            cause = cause.getCause();
+        }
+    }
 }

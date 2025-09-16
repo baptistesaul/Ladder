@@ -39,12 +39,12 @@ public class WrapperServiceCollection implements ScopedServiceCollection {
     }
 
     @Override
-    public <Impl> void addScoped(JavaPlugin plugin, Class<Impl> classImplementation) {
+    public <Impl> void addScoped(Class<Impl> classImplementation) {
         _serviceCollection.addScoped(_plugin, classImplementation);
     }
 
     @Override
-    public <Impl> void addScoped(JavaPlugin plugin, Impl implementation) {
+    public <Impl> void addScoped(Impl implementation) {
         _serviceCollection.addScoped(_plugin, implementation);
     }
 

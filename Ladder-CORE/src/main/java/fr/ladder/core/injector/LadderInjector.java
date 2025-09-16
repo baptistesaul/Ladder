@@ -2,9 +2,11 @@ package fr.ladder.core.injector;
 
 import fr.ladder.api.injector.Injector;
 import fr.ladder.api.injector.ScopedServiceCollection;
+import fr.ladder.core.LadderEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
@@ -17,24 +19,48 @@ import java.util.logging.Logger;
  */
 public class LadderInjector implements Injector.Implementation {
 
+    private final LadderEngine _engine;
+
     private Set<JavaPlugin> _plugins;
 
-    private final LadderServiceCollection _serviceCollection;
+    private LadderServiceCollection _serviceCollection;
 
-    public LadderInjector() {
+    public LadderInjector(LadderEngine engine) {
+        _engine = engine;
         _plugins = new HashSet<>();
         _serviceCollection = new LadderServiceCollection();
+    }
+
+    @Override
+    public void implement(Class<?> clazz, Object instance) {
+        Field[] fields = clazz.getDeclaredFields();
+        for(Field field : fields) {
+            if(field.getType().isAssignableFrom(instance.getClass())) {
+                try {
+                    field.setAccessible(true);
+                    field.set(null, instance);
+                } catch (IllegalAccessException e) {
+                    _engine.catchException("An error occurred on implement: " + clazz.getSimpleName(), e);
+                }
+            }
+        }
     }
 
     @Override
     public void setupInjection(JavaPlugin plugin, Consumer<ScopedServiceCollection> consumer) {
         _plugins.add(plugin);
         _serviceCollection.addAll(plugin);
+        // default bindings
+        _serviceCollection.addScoped(plugin, plugin);
+        _serviceCollection.addScoped(plugin, plugin.getLogger());
         consumer.accept(new WrapperServiceCollection(plugin, _serviceCollection));
     }
 
-    @Override
     public void runInjection() {
+        if(_plugins == null)
+            throw new IllegalStateException("Injection has already been run.");
+
+        // ============ INJECTION ============
         final Logger logger = Bukkit.getLogger();
         logger.info("Injecting dependencies...");
         Instant start = Instant.now();
@@ -42,5 +68,9 @@ public class LadderInjector implements Injector.Implementation {
         Duration duration = Duration.between(start, Instant.now());
         logger.info("Injection finished!");
         logger.info("> time: " + (duration.toNanos() / 10000) / 100D + "ms");
+
+        // ============ FREE MEMORY ===========
+        _plugins = null;
+        _serviceCollection = null;
     }
 }
