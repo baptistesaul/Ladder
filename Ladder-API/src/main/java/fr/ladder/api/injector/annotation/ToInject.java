@@ -14,6 +14,6 @@ public @interface ToInject {
     enum Type {
         SINGLETON,
         SCOPED,
-        TRANSIENT;
+        TRANSIENT
     }
 }

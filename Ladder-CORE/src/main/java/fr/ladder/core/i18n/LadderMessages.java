@@ -1,9 +1,6 @@
 package fr.ladder.core.i18n;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import fr.ladder.api.i18n.Messages;
 import fr.ladder.api.i18n.Var;
@@ -81,7 +78,7 @@ public class LadderMessages implements Messages.Implementation {
             _messages.put(path.substring(1), message.toString());
         } else if(element instanceof JsonObject obj) {
             obj.entrySet().forEach(member -> this.load(path + "." + member.getKey(), member.getValue()));
-        } else if(element.getAsString() != null) {
+        } else if(element instanceof JsonPrimitive primitive && primitive.isString()) {
             _messages.put(path.substring(1), element.getAsString());
         }
     }
