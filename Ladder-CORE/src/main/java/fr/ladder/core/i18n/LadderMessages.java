@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import fr.ladder.api.i18n.Messages;
+import fr.ladder.api.i18n.Var;
 import fr.ladder.api.injector.annotation.Inject;
 import fr.ladder.api.util.ReflectionUtils;
 import fr.ladder.api.util.graph.IGraph;
@@ -14,16 +16,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class LadderMessages {
+public class LadderMessages implements Messages.Implementation {
 
     @Inject
     private static LadderEngine _engine;
 
     private final Map<String, String> _messages;
+
+    private final Collection<Var> defaultVars = new ArrayList<>();
 
     public LadderMessages() {
         _messages = new HashMap<>();
@@ -43,7 +49,7 @@ public class LadderMessages {
         }
     }
 
-    public void loadAllMessages(JavaPlugin plugin, String filename) {
+    private void loadAllMessages(JavaPlugin plugin, String filename) {
         try(InputStream inputStream = plugin.getResource(filename)) {
             if(inputStream == null) {
                 plugin.getLogger().warning("| File '" + filename + "' wasn't found.");
@@ -78,5 +84,41 @@ public class LadderMessages {
         } else if(element.getAsString() != null) {
             _messages.put(path.substring(1), element.getAsString());
         }
+    }
+
+    private String formatMessage(String message, Var... vars) {
+        for(Var var : vars) {
+            message = message.replace('{' + var.key() + '}', var.value());
+        }
+
+        for(Var var : this.defaultVars) {
+            message = message.replace('{' + var.key() + '}', var.value());
+        }
+
+        return message.replace("\t", "  ");
+    }
+
+    @Override
+    public boolean exists(String path) {
+        return _messages.containsKey(path);
+    }
+
+    @Override
+    public String get(String path, Var... vars) {
+        String message = _messages.get(path);
+        if(message == null)
+            throw new IllegalArgumentException("Missing message for the path: \"" + path + "\"");
+
+        return this.formatMessage(message, vars);
+    }
+
+    @Override
+    public String[] array(String path, Var... vars) {
+        return this.get(path, vars).split("\n");
+    }
+
+    @Override
+    public void addDefaultVariable(String key, Object value) {
+        this.defaultVars.add(Var.of(key, value));
     }
 }

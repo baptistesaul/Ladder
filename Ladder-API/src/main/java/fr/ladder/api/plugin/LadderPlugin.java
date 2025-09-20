@@ -1,5 +1,6 @@
 package fr.ladder.api.plugin;
 
+import fr.ladder.api.i18n.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +19,8 @@ public abstract class LadderPlugin extends JavaPlugin {
     public void onEnable() {
         final Logger logger = Bukkit.getLogger();
         logger.info("==================[ enabling: " + this.getDescription().getName() + " ]==================");
+        logger.info("LANG:");
+        Messages.loadAllMessages(this);
     }
 
     @Override
