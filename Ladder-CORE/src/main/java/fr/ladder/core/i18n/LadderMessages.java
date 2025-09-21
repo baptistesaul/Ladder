@@ -57,12 +57,12 @@ public class LadderMessages implements Messages.Implementation {
                 return;
             }
 
-            plugin.getLogger().warning("| Loading file '" + filename + "'...");
+            plugin.getLogger().info("| Loading messages of '" + filename + "'.");
             try(JsonReader reader = new JsonReader(new InputStreamReader(inputStream))) {
                 this.load("", new JsonParser().parse(reader));
             }
             catch(JsonSyntaxException e) {
-                plugin.getLogger().severe("| File '" + filename + "' has a bad json syntax.");
+                LadderAPI.catchException(plugin.getLogger(), "| File '" + filename + "' has a bad json syntax.", e);
             }
         } catch(IOException e) {
             LadderAPI.catchException(plugin.getLogger(), "An error occurred while loading lang file: " + filename, e);
