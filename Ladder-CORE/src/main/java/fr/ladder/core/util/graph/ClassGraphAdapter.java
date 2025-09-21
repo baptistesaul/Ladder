@@ -23,10 +23,11 @@ public class ClassGraphAdapter implements IGraph {
         Instant start = Instant.now();
         _result = graph.scan();
         Duration duration = Duration.between(start, Instant.now());
-
-        plugin.getLogger().info("Plugin scan completed!");
-        plugin.getLogger().info("> time: " + (duration.toNanos() / 10000) / 100D + "ms");
-
+        double durationInMs = (duration.toNanos() / 10000D) / 100D;
+        if(durationInMs > 100) {
+            plugin.getLogger().info("Plugin scan completed!");
+            plugin.getLogger().warning("> time: " + (duration.toNanos() / 10000) / 100D + "ms");
+        }
     }
 
     @Override

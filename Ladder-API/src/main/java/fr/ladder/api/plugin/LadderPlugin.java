@@ -19,7 +19,7 @@ public abstract class LadderPlugin extends JavaPlugin {
     public void onEnable() {
         final Logger logger = Bukkit.getLogger();
         logger.info("==================[ enabling: " + this.getDescription().getName() + " ]==================");
-        logger.info("LANG:");
+        this.getLogger().info("LANG:");
         Messages.loadAllMessages(this);
     }
 
