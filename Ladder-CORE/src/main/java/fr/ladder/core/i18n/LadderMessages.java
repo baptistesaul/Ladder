@@ -2,6 +2,7 @@ package fr.ladder.core.i18n;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import fr.ladder.api.LadderAPI;
 import fr.ladder.api.i18n.Messages;
 import fr.ladder.api.i18n.Var;
 import fr.ladder.api.injector.annotation.Inject;
@@ -37,12 +38,15 @@ public class LadderMessages implements Messages.Implementation {
         final String language = _engine.getConfig()
                 .getString("language", "fr")
                 .toLowerCase();
+
         try(IGraph graph = ReflectionUtils.getGraph(plugin)) {
             final Pattern pattern = Pattern.compile("lang/" + language + "/.*\\.json");
             // fetch all lang files
-            graph.getResources(pattern).forEach(resource ->
-                    this.loadAllMessages(plugin, resource)
-            );
+
+            int previousSize = _messages.size();
+            graph.getResources(pattern).forEach(resource -> this.loadAllMessages(plugin, resource));
+            plugin.getLogger().info("| All messages has been successfully loaded.");
+            plugin.getLogger().info("| Number of loaded messages: " + (_messages.size() - previousSize));
         }
     }
 
@@ -53,17 +57,15 @@ public class LadderMessages implements Messages.Implementation {
                 return;
             }
 
-            int previousSize = _messages.size();
+            plugin.getLogger().warning("| Loading file '" + filename + "'...");
             try(JsonReader reader = new JsonReader(new InputStreamReader(inputStream))) {
                 this.load("", new JsonParser().parse(reader));
-                plugin.getLogger().info("| All messages has been successfully loaded.");
-                plugin.getLogger().info("| Number of loaded messages: " + (_messages.size() - previousSize));
             }
-            catch(IOException e) {
+            catch(JsonSyntaxException e) {
                 plugin.getLogger().severe("| File '" + filename + "' has a bad json syntax.");
             }
         } catch(IOException e) {
-            // plugin.catchException("An error occurred while loading lang file: " + this.filename, e);
+            LadderAPI.catchException(plugin.getLogger(), "An error occurred while loading lang file: " + filename, e);
         }
     }
 

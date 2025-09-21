@@ -4,6 +4,7 @@ import fr.ladder.api.game.GameHandler;
 import org.bukkit.Bukkit;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
 public abstract class LadderAPI {
 
@@ -15,13 +16,17 @@ public abstract class LadderAPI {
         return impl.getGameHandler();
     }
 
-    public static void catchException(String errorMessage, Throwable ex) {
-        Bukkit.getLogger().severe(errorMessage);
+    public static void catchException(Logger logger, String errorMessage, Throwable ex) {
+        logger.severe(errorMessage);
         Throwable cause = ex;
         while(cause != null) {
-            Bukkit.getLogger().severe("- " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
+            logger.severe("- " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
             cause = cause.getCause();
         }
+    }
+
+    public static void catchException(String errorMessage, Throwable ex) {
+        catchException(Bukkit.getLogger(), errorMessage, ex);
     }
 
     public interface Implementation {
