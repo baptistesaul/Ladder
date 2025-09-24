@@ -1,8 +1,8 @@
 package fr.ladder.core.injector;
 
+import fr.ladder.api.LadderAPI;
 import fr.ladder.api.injector.Injector;
 import fr.ladder.api.injector.ScopedServiceCollection;
-import fr.ladder.core.LadderEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,14 +19,11 @@ import java.util.logging.Logger;
  */
 public class LadderInjector implements Injector.Implementation {
 
-    private final LadderEngine _engine;
-
     private Set<JavaPlugin> _plugins;
 
     private LadderServiceCollection _serviceCollection;
 
-    public LadderInjector(LadderEngine engine) {
-        _engine = engine;
+    public LadderInjector() {
         _plugins = new HashSet<>();
         _serviceCollection = new LadderServiceCollection();
     }
@@ -40,7 +37,7 @@ public class LadderInjector implements Injector.Implementation {
                     field.setAccessible(true);
                     field.set(null, instance);
                 } catch (IllegalAccessException e) {
-                    _engine.catchException("An error occurred on implement: " + clazz.getSimpleName(), e);
+                    LadderAPI.catchException("An error occurred on implement: " + clazz.getSimpleName(), e);
                 }
             }
         }

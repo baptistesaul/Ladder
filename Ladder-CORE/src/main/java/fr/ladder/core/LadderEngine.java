@@ -31,7 +31,7 @@ public class LadderEngine extends LadderPlugin implements LadderAPI.Implementati
     public LadderEngine() {
         _executor = new LadderExecutor();
         // ============ SETUP INJECTOR ============
-        _injector = new LadderInjector(this);
+        _injector = new LadderInjector();
         _injector.implement(Injector.class, _injector);
         // ============ SETUP UTILS ===============
         _injector.implement(ItemUtils.class, new LadderItemUtils());
